@@ -1,12 +1,13 @@
-version: '3.9'
-
+name: karate
 services:
   web:
     build: .
-    command: gunicorn mysite.wsgi:application --bind 0.0.0.0:8000
+    container_name: django_app
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/mysite
+      - .:/app
     ports:
       - "8000:8000"
-    environment:
-      DJANGO_SETTINGS_MODULE: mysite.settings
+    env_file:
+      - .env
+

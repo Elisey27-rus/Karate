@@ -1,20 +1,24 @@
-# Используем официальный образ Python 3.10
-FROM python:3.10
+# Используем официальный образ Python в качестве базового
+FROM python:3.12-slim
 
 # Устанавливаем рабочую директорию
-WORKDIR /mysite
+WORKDIR /app
 
-# Копируем зависимости
-COPY requirements.txt .
+# Копируем файлы приложения в контейнер
+COPY . /app
 
-# Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt
+# Устанавливаем зависимости приложения
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Копируем остальные файлы проекта
-COPY . .
+# Устанавливаем переменные окружения для Django
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE mysite.settings
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV DJANGO_DEBUG=False
 
-# Собираем статику
-RUN python manage.py collectstatic --noinput
+# Открываем порт 8000 для доступа к приложению
+EXPOSE 8000
 
-# Указываем команду запуска контейнера
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mysite.wsgi:application"]
+# Команда для запуска приложения
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
